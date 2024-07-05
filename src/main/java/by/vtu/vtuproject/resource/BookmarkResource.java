@@ -15,7 +15,7 @@ public class BookmarkResource extends RepresentationModel<BookmarkResource> {
         String userName = bookmark.getAccount().getUserName();
         this.add(Link.of(bookmark.getUri(), "bookmark-uri"));
         this.add(linkTo(BookmarkRestController.class, userName).withRel("bookmarks"));
-        this.add(linkTo(methodOn(BookmarkRestController.class, userName).readBookmark(userName, bookmark.getId())).withSelfRel());
+        this.add(linkTo(methodOn(BookmarkRestController.class, userName).readBookmark(null, bookmark.getId())).withSelfRel());
     }
 
     public Bookmark getBookmark() {

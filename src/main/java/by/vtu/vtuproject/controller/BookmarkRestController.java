@@ -5,7 +5,6 @@ import by.vtu.vtuproject.exception.UserNotFoundException;
 import by.vtu.vtuproject.repository.AccountRepository;
 import by.vtu.vtuproject.repository.BookmarkRepository;
 import by.vtu.vtuproject.resource.BookmarkResource;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
@@ -15,18 +14,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Collection;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/{userName}/bookmarks")
+@RequestMapping("/bookmarks")
 @RequiredArgsConstructor
 public class BookmarkRestController {
     private final BookmarkRepository bookmarkRepository;
     private final AccountRepository accountRepository;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> add(@PathVariable String userName, @RequestBody Bookmark input) {
+    public ResponseEntity<?> add(Principal principal, @RequestBody Bookmark input) {
+        String userName = principal.getName();
         this.validateUser(userName);
         return accountRepository
                 .findAccountByUserName(userName)
@@ -41,13 +41,15 @@ public class BookmarkRestController {
     }
 
     @RequestMapping(value = "/{bookmarkId}", method = RequestMethod.GET)
-    public Bookmark readBookmark(@PathVariable String userName, @PathVariable Long bookmarkId) {
+    public Bookmark readBookmark(Principal principal, @PathVariable Long bookmarkId) {
+        String userName = principal.getName();
         this.validateUser(userName);
         return bookmarkRepository.findById(bookmarkId).orElseThrow();
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public CollectionModel<BookmarkResource> readBookmarks(@PathVariable String userName) {
+    public CollectionModel<BookmarkResource> readBookmarks(Principal principal) {
+        String userName = principal.getName();
         this.validateUser(userName);
         List<BookmarkResource> bookmarkResourceList = bookmarkRepository.findByAccountUserName(userName)
                 .stream()
